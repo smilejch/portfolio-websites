@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAWKID Studio - We Make Bold Things</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --black: #0D0D0D;
+            --white: #F2F2F0;
+            --neon: #CDFF50;
+            --coral: #FF6B6B;
+            --blue: #4ECDC4;
+            --purple: #C77DFF;
+            --text-dim: #666;
+            --grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--black); color: var(--white);
+            overflow-x: hidden; cursor: default;
+        }
+        .syne { font-family: 'Syne', sans-serif; }
+
+        /* Cursor blob */
+        .cursor-blob {
+            width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(205,255,80,0.08), transparent 70%);
+            position: fixed; pointer-events: none; z-index: 0;
+            transform: translate(-50%, -50%); transition: transform 0.1s;
+        }
+
+        /* Grain overlay */
+        .grain {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--grain); pointer-events: none; z-index: 9999;
+            opacity: 0.5;
+        }
+
+        /* Nav */
+        .navbar {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            padding: 24px 48px; display: flex; justify-content: space-between; align-items: center;
+            mix-blend-mode: difference;
+        }
+        .logo {
+            font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+            letter-spacing: -0.5px; color: var(--white);
+        }
+        .logo span { color: var(--neon); }
+        .nav-links { display: flex; gap: 32px; list-style: none; }
+        .nav-links a {
+            color: var(--white); text-decoration: none; font-size: 13px;
+            font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
+            position: relative; padding-bottom: 4px;
+        }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: 0; left: 0;
+            width: 0; height: 2px; background: var(--neon);
+            transition: width 0.3s;
+        }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-cta {
+            padding: 10px 24px; border: 1px solid var(--white); color: var(--white);
+            background: transparent; font-size: 12px; font-weight: 600;
+            letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+            transition: all 0.3s; border-radius: 50px; text-decoration: none;
+        }
+        .nav-cta:hover { background: var(--neon); color: var(--black); border-color: var(--neon); }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; padding: 120px 48px 80px;
+            position: relative;
+        }
+        .hero-marquee {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            white-space: nowrap; font-family: 'Syne', sans-serif;
+            font-size: 18vw; font-weight: 800; color: rgba(242, 242, 240, 0.03);
+            animation: marqueeHero 20s linear infinite; pointer-events: none;
+        }
+        @keyframes marqueeHero { 0% { transform: translateY(-50%) translateX(0); } 100% { transform: translateY(-50%) translateX(-50%); } }
+
+        .hero-content { position: relative; z-index: 1; }
+        .hero-top {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 40px;
+        }
+        .hero-tag {
+            writing-mode: vertical-rl; text-orientation: mixed;
+            font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+            color: var(--neon); font-weight: 600;
+        }
+        .hero-year {
+            font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(60px, 10vw, 140px); font-weight: 800;
+            line-height: 0.95; letter-spacing: -4px;
+            margin-bottom: 48px;
+        }
+        .hero h1 .outline {
+            -webkit-text-stroke: 2px var(--white);
+            color: transparent;
+        }
+        .hero h1 .neon { color: var(--neon); }
+        .hero h1 .italic { font-style: italic; }
+
+        .hero-bottom {
+            display: flex; justify-content: space-between; align-items: flex-end;
+        }
+        .hero-desc {
+            max-width: 420px; font-size: 16px; color: var(--text-dim);
+            line-height: 1.8;
+        }
+        .hero-scroll {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 8px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+            color: var(--text-dim);
+        }
+        .scroll-line {
+            width: 1px; height: 60px; background: linear-gradient(to bottom, var(--neon), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+        @keyframes scrollPulse { 0%, 100% { opacity: 1; height: 60px; } 50% { opacity: 0.3; height: 40px; } }
+
+        /* Horizontal scroll showcase */
+        .showcase { padding: 80px 0; overflow: hidden; }
+        .showcase-label {
+            padding: 0 48px; font-size: 11px; letter-spacing: 4px;
+            text-transform: uppercase; color: var(--neon); font-weight: 600;
+            margin-bottom: 40px;
+            display: flex; align-items: center; gap: 16px;
+        }
+        .showcase-label::after { content: ''; flex: 1; height: 1px; background: rgba(242,242,240,0.08); }
+        .showcase-track {
+            display: flex; gap: 24px; padding: 0 48px;
+            animation: scrollShowcase 30s linear infinite;
+        }
+        .showcase-card {
+            flex-shrink: 0; width: 420px; position: relative; overflow: hidden;
+            border-radius: 12px; cursor: pointer; group: true;
+        }
+        .showcase-img {
+            width: 100%; height: 520px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 80px; transition: transform 0.6s ease, filter 0.6s;
+        }
+        .showcase-card:hover .showcase-img { transform: scale(1.08); }
+        .sc-1 { background: linear-gradient(145deg, #1a1a2e, #16213e); }
+        .sc-2 { background: linear-gradient(145deg, #2d1b2e, #1a1a2e); }
+        .sc-3 { background: linear-gradient(145deg, #1b2e1e, #1a1a2e); }
+        .sc-4 { background: linear-gradient(145deg, #2e2b1a, #1a1a2e); }
+        .sc-5 { background: linear-gradient(145deg, #1a2e2d, #1a1a2e); }
+        .showcase-info {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 32px; background: linear-gradient(transparent, rgba(13,13,13,0.9));
+        }
+        .showcase-cat {
+            font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+            color: var(--neon); margin-bottom: 8px; font-weight: 600;
+        }
+        .showcase-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
+        @keyframes scrollShowcase { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-444px * 5)); } }
+
+        /* About section - Split layout */
+        .about {
+            padding: 160px 48px; display: grid;
+            grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+            max-width: 1400px; margin: 0 auto;
+        }
+        .about-left {}
+        .about-counter {
+            font-family: 'Syne', sans-serif; font-size: 200px; font-weight: 800;
+            line-height: 0.85; letter-spacing: -8px;
+            -webkit-text-stroke: 1px rgba(242,242,240,0.15); color: transparent;
+            margin-bottom: 40px;
+        }
+        .about-counter .filled { -webkit-text-stroke: none; color: var(--neon); font-size: 100px; }
+        .about-text h2 {
+            font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800;
+            line-height: 1.15; margin-bottom: 24px; letter-spacing: -1px;
+        }
+        .about-text p { font-size: 16px; color: var(--text-dim); line-height: 2; margin-bottom: 16px; }
+        .about-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
+        .about-tag {
+            padding: 8px 20px; border: 1px solid rgba(242,242,240,0.12);
+            border-radius: 50px; font-size: 12px; font-weight: 500;
+            letter-spacing: 1px; transition: all 0.3s;
+        }
+        .about-tag:hover { border-color: var(--neon); color: var(--neon); }
+
+        /* Services - Accordion style */
+        .services { padding: 120px 48px; max-width: 1200px; margin: 0 auto; }
+        .services-header { margin-bottom: 80px; }
+        .services-header .label {
+            font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+            color: var(--neon); font-weight: 600; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .services-header .label::before { content: ''; width: 40px; height: 1px; background: var(--neon); }
+        .services-header h2 {
+            font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800;
+            letter-spacing: -2px;
+        }
+        .service-row {
+            border-top: 1px solid rgba(242,242,240,0.08);
+            padding: 40px 0; display: grid;
+            grid-template-columns: 80px 1fr 200px 40px;
+            gap: 40px; align-items: center;
+            transition: all 0.4s; cursor: pointer;
+        }
+        .service-row:last-child { border-bottom: 1px solid rgba(242,242,240,0.08); }
+        .service-row:hover { padding-left: 20px; }
+        .service-row:hover .service-name { color: var(--neon); }
+        .service-num {
+            font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+            color: var(--text-dim);
+        }
+        .service-name {
+            font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700;
+            transition: color 0.3s; letter-spacing: -1px;
+        }
+        .service-desc { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+        .service-arrow {
+            font-size: 24px; color: var(--text-dim); transition: all 0.3s;
+        }
+        .service-row:hover .service-arrow { color: var(--neon); transform: rotate(-45deg); }
+
+        /* Clients */
+        .clients { padding: 120px 48px; }
+        .clients-container { max-width: 1400px; margin: 0 auto; }
+        .clients-header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 60px;
+        }
+        .clients-header h2 { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; letter-spacing: -2px; }
+        .clients-count { font-size: 13px; color: var(--text-dim); }
+        .clients-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+            background: rgba(242,242,240,0.06);
+        }
+        .client-cell {
+            padding: 48px; background: var(--black);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 700; color: var(--text-dim);
+            letter-spacing: 2px; text-transform: uppercase;
+            transition: all 0.4s; cursor: default;
+        }
+        .client-cell:hover { color: var(--white); background: rgba(205,255,80,0.03); }
+
+        /* Testimonials - Card stack */
+        .reviews { padding: 120px 48px; max-width: 1000px; margin: 0 auto; }
+        .reviews-header {
+            text-align: center; margin-bottom: 60px;
+        }
+        .reviews-header .label {
+            font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+            color: var(--neon); font-weight: 600; margin-bottom: 20px;
+        }
+        .reviews-header h2 {
+            font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800;
+            letter-spacing: -2px;
+        }
+        .review-stack { position: relative; }
+        .review-card {
+            padding: 48px; border: 1px solid rgba(242,242,240,0.08);
+            border-radius: 16px; margin-bottom: 20px;
+            background: rgba(255,255,255,0.02);
+            transition: all 0.4s;
+        }
+        .review-card:hover { border-color: rgba(205,255,80,0.2); transform: translateX(8px); }
+        .review-text {
+            font-size: 20px; line-height: 1.8; margin-bottom: 32px;
+            font-family: 'Syne', sans-serif; font-weight: 500;
+        }
+        .review-author-row { display: flex; justify-content: space-between; align-items: center; }
+        .review-author { font-size: 14px; font-weight: 700; }
+        .review-role { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+        .review-project {
+            font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+            color: var(--neon); font-weight: 600;
+        }
+
+        /* CTA */
+        .cta {
+            padding: 200px 48px; text-align: center; position: relative;
+        }
+        .cta::before {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(205,255,80,0.06), transparent 70%);
+            pointer-events: none;
+        }
+        .cta-label {
+            font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+            color: var(--neon); font-weight: 600; margin-bottom: 32px;
+        }
+        .cta h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(48px, 8vw, 100px); font-weight: 800;
+            line-height: 0.95; letter-spacing: -3px;
+            margin-bottom: 40px; position: relative; z-index: 1;
+        }
+        .cta h2 .outline {
+            -webkit-text-stroke: 2px var(--white);
+            color: transparent;
+        }
+        .cta-btn {
+            display: inline-flex; align-items: center; gap: 12px;
+            padding: 20px 48px; background: var(--neon); color: var(--black);
+            border: none; border-radius: 50px; font-size: 14px; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+            transition: all 0.3s; text-decoration: none; position: relative; z-index: 1;
+        }
+        .cta-btn:hover { transform: scale(1.05); box-shadow: 0 0 60px rgba(205,255,80,0.3); }
+        .cta-btn .arrow { font-size: 20px; transition: transform 0.3s; }
+        .cta-btn:hover .arrow { transform: translateX(4px); }
+        .cta-sub {
+            font-size: 13px; color: var(--text-dim); margin-top: 20px;
+            position: relative; z-index: 1;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 60px 48px; border-top: 1px solid rgba(242,242,240,0.06);
+        }
+        .footer-container { max-width: 1400px; margin: 0 auto; }
+        .footer-top {
+            display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 40px;
+            margin-bottom: 80px;
+        }
+        .footer-brand .logo { font-size: 24px; margin-bottom: 16px; }
+        .footer-brand p { font-size: 13px; color: var(--text-dim); line-height: 1.8; }
+        .footer-col h4 {
+            font-size: 10px; font-weight: 700; letter-spacing: 3px;
+            text-transform: uppercase; color: var(--text-dim); margin-bottom: 20px;
+        }
+        .footer-col a {
+            display: block; font-size: 14px; color: rgba(242,242,240,0.5);
+            text-decoration: none; padding: 6px 0; transition: color 0.3s;
+        }
+        .footer-col a:hover { color: var(--neon); }
+        .footer-bottom {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 32px; border-top: 1px solid rgba(242,242,240,0.06);
+        }
+        .footer-copy { font-size: 12px; color: var(--text-dim); }
+        .footer-social { display: flex; gap: 24px; }
+        .footer-social a {
+            font-size: 12px; color: var(--text-dim); text-decoration: none;
+            text-transform: uppercase; letter-spacing: 2px; font-weight: 600;
+            transition: color 0.3s;
+        }
+        .footer-social a:hover { color: var(--neon); }
+
+        /* Marquee divider */
+        .marquee-divider {
+            padding: 24px 0; border-top: 1px solid rgba(242,242,240,0.06);
+            border-bottom: 1px solid rgba(242,242,240,0.06);
+            overflow: hidden;
+        }
+        .marquee-track {
+            display: flex; gap: 48px; animation: marqueeTrack 25s linear infinite;
+            white-space: nowrap;
+        }
+        .marquee-item {
+            font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+            letter-spacing: 4px; text-transform: uppercase; flex-shrink: 0;
+            display: flex; align-items: center; gap: 48px;
+        }
+        .marquee-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neon); }
+        @keyframes marqueeTrack { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* Scroll animations */
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-left { opacity: 0; transform: translateX(-40px); transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 20px 24px; }
+            .nav-links { display: none; }
+            .hero { padding: 120px 24px 60px; }
+            .hero h1 { font-size: 48px; letter-spacing: -2px; }
+            .hero-top { flex-direction: column; gap: 16px; }
+            .hero-tag { writing-mode: horizontal-tb; }
+            .hero-bottom { flex-direction: column; gap: 32px; align-items: flex-start; }
+            .about { grid-template-columns: 1fr; padding: 80px 24px; }
+            .about-counter { font-size: 100px; letter-spacing: -4px; }
+            .about-counter .filled { font-size: 60px; }
+            .services { padding: 80px 24px; }
+            .services-header h2 { font-size: 36px; }
+            .service-row { grid-template-columns: 40px 1fr 40px; gap: 16px; }
+            .service-desc { display: none; }
+            .service-name { font-size: 22px; }
+            .clients { padding: 80px 24px; }
+            .clients-grid { grid-template-columns: repeat(2, 1fr); }
+            .clients-header h2 { font-size: 32px; }
+            .reviews { padding: 80px 24px; }
+            .reviews-header h2 { font-size: 32px; }
+            .review-text { font-size: 16px; }
+            .review-author-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .cta { padding: 100px 24px; }
+            .cta h2 { font-size: 40px; letter-spacing: -1px; }
+            .footer { padding: 40px 24px; }
+            .footer-top { grid-template-columns: 1fr; gap: 32px; }
+            .footer-bottom { flex-direction: column; gap: 16px; }
+            .showcase-card { width: 300px; }
+            .showcase-img { height: 380px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="grain"></div>
+    <div class="cursor-blob" id="cursorBlob"></div>
+
+    <nav class="navbar">
+        <div class="logo syne">RAW<span>KID</span></div>
+        <ul class="nav-links">
+            <li><a href="#work">Work</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <a href="#contact" class="nav-cta">Let's Talk</a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-marquee">RAWKID STUDIO RAWKID STUDIO RAWKID STUDIO&nbsp;</div>
+        <div class="hero-content">
+            <div class="hero-top">
+                <div class="hero-tag">Creative Studio</div>
+                <div class="hero-year">Est. 2019 / Seoul</div>
+            </div>
+            <h1 class="syne">
+                We Make<br>
+                <span class="outline">Bold</span> <span class="neon italic">Things</span><br>
+                Happen
+            </h1>
+            <div class="hero-bottom">
+                <p class="hero-desc">
+                    브랜딩, 디지털 프로덕트, 모션 디자인 &mdash;
+                    우리는 과감한 아이디어와 정교한 크래프트로
+                    브랜드의 가능성을 확장합니다.
+                </p>
+                <div class="hero-scroll">
+                    <div class="scroll-line"></div>
+                    Scroll
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="marquee-divider">
+        <div class="marquee-track">
+            <span class="marquee-item">Branding <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Digital Product <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Motion Design <span class="marquee-dot"></span></span>
+            <span class="marquee-item">UX/UI Design <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Campaign <span class="marquee-dot"></span></span>
+            <span class="marquee-item">3D & AR <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Branding <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Digital Product <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Motion Design <span class="marquee-dot"></span></span>
+            <span class="marquee-item">UX/UI Design <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Campaign <span class="marquee-dot"></span></span>
+            <span class="marquee-item">3D & AR <span class="marquee-dot"></span></span>
+        </div>
+    </div>
+
+    <section class="showcase" id="work">
+        <div class="showcase-label">Selected Work / 2023 &mdash; 2026</div>
+        <div class="showcase-track">
+            <div class="showcase-card">
+                <div class="showcase-img sc-1">🎨</div>
+                <div class="showcase-info">
+                    <div class="showcase-cat">Branding</div>
+                    <div class="showcase-title">MOODA Beauty</div>
+                </div>
+            </div>
+            <div class="showcase-card">
+                <div class="showcase-img sc-2">📱</div>
+                <div class="showcase-info">
+                    <div class="showcase-cat">Digital Product</div>
+                    <div class="showcase-title">FitLoop App</div>
+                </div>
+            </div>
+            <div class="showcase-card">
+                <div class="showcase-img sc-3">🎬</div>
+                <div class="showcase-info">
+                    <div class="showcase-cat">Motion</div>
+                    <div class="showcase-title">Green Wave Campaign</div>
+                </div>
+            </div>
+            <div class="showcase-card">
+                <div class="showcase-img sc-4">🖥️</div>
+                <div class="showcase-info">
+                    <div class="showcase-cat">Web Design</div>
+                    <div class="showcase-title">Vertex Capital</div>
+                </div>
+            </div>
+            <div class="showcase-card">
+                <div class="showcase-img sc-5">🏷️</div>
+                <div class="showcase-info">
+                    <div class="showcase-cat">Packaging</div>
+                    <div class="showcase-title">ARVO Coffee</div>
+                </div>
+            </div>
+            <!-- Duplicate for infinite scroll -->
+            <div class="showcase-card">
+                <div class="showcase-img sc-1">🎨</div>
+                <div class="showcase-info">
+                    <div class="showcase-cat">Branding</div>
+                    <div class="showcase-title">MOODA Beauty</div>
+                </div>
+            </div>
+            <div class="showcase-card">
+                <div class="showcase-img sc-2">📱</div>
+                <div class="showcase-info">
+                    <div class="showcase-cat">Digital Product</div>
+                    <div class="showcase-title">FitLoop App</div>
+                </div>
+            </div>
+            <div class="showcase-card">
+                <div class="showcase-img sc-3">🎬</div>
+                <div class="showcase-info">
+                    <div class="showcase-cat">Motion</div>
+                    <div class="showcase-title">Green Wave Campaign</div>
+                </div>
+            </div>
+            <div class="showcase-card">
+                <div class="showcase-img sc-4">🖥️</div>
+                <div class="showcase-info">
+                    <div class="showcase-cat">Web Design</div>
+                    <div class="showcase-title">Vertex Capital</div>
+                </div>
+            </div>
+            <div class="showcase-card">
+                <div class="showcase-img sc-5">🏷️</div>
+                <div class="showcase-info">
+                    <div class="showcase-cat">Packaging</div>
+                    <div class="showcase-title">ARVO Coffee</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about reveal" id="about">
+        <div class="about-left">
+            <div class="about-counter syne">
+                <span class="filled">7</span><br>YRS
+            </div>
+        </div>
+        <div class="about-text">
+            <h2 class="syne">우리는 지루한 것을<br>거부합니다</h2>
+            <p>RAWKID Studio는 2019년 서울에서 시작된 크리에이티브 스튜디오입니다. 우리는 브랜딩, 디지털 프로덕트, 모션 디자인 분야에서 경계를 허무는 작업을 합니다.</p>
+            <p>"평범한 것은 만들지 않는다"는 원칙 아래, 브랜드가 가진 본질을 과감하고 아름다운 방식으로 표현합니다. 현재 12명의 크리에이터가 함께합니다.</p>
+            <div class="about-tags">
+                <span class="about-tag">Branding</span>
+                <span class="about-tag">UI/UX</span>
+                <span class="about-tag">Motion</span>
+                <span class="about-tag">3D</span>
+                <span class="about-tag">Campaign</span>
+                <span class="about-tag">Packaging</span>
+                <span class="about-tag">Web Dev</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="services reveal" id="services">
+        <div class="services-header">
+            <div class="label">What We Do</div>
+            <h2 class="syne">Services</h2>
+        </div>
+        <div class="service-row">
+            <div class="service-num">01</div>
+            <div class="service-name syne">Brand Identity</div>
+            <div class="service-desc">로고, 컬러, 타이포그래피부터 브랜드 가이드라인까지 완성합니다.</div>
+            <div class="service-arrow">&rarr;</div>
+        </div>
+        <div class="service-row">
+            <div class="service-num">02</div>
+            <div class="service-name syne">Digital Product</div>
+            <div class="service-desc">앱, 웹서비스의 UX/UI 설계와 프로토타이핑을 수행합니다.</div>
+            <div class="service-arrow">&rarr;</div>
+        </div>
+        <div class="service-row">
+            <div class="service-num">03</div>
+            <div class="service-name syne">Motion & Film</div>
+            <div class="service-desc">브랜드 영상, 모션 그래픽, 소셜 콘텐츠를 제작합니다.</div>
+            <div class="service-arrow">&rarr;</div>
+        </div>
+        <div class="service-row">
+            <div class="service-num">04</div>
+            <div class="service-name syne">Web Development</div>
+            <div class="service-desc">인터랙티브하고 퍼포먼스에 최적화된 웹사이트를 구축합니다.</div>
+            <div class="service-arrow">&rarr;</div>
+        </div>
+        <div class="service-row">
+            <div class="service-num">05</div>
+            <div class="service-name syne">Campaign & Content</div>
+            <div class="service-desc">디지털 캠페인 기획부터 SNS 콘텐츠 운영까지 지원합니다.</div>
+            <div class="service-arrow">&rarr;</div>
+        </div>
+    </section>
+
+    <div class="marquee-divider">
+        <div class="marquee-track" style="animation-direction: reverse;">
+            <span class="marquee-item">Samsung <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Naver <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Kakao <span class="marquee-dot"></span></span>
+            <span class="marquee-item">LG <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Hyundai <span class="marquee-dot"></span></span>
+            <span class="marquee-item">CJ <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Amore Pacific <span class="marquee-dot"></span></span>
+            <span class="marquee-item">SK <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Samsung <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Naver <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Kakao <span class="marquee-dot"></span></span>
+            <span class="marquee-item">LG <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Hyundai <span class="marquee-dot"></span></span>
+            <span class="marquee-item">CJ <span class="marquee-dot"></span></span>
+            <span class="marquee-item">Amore Pacific <span class="marquee-dot"></span></span>
+            <span class="marquee-item">SK <span class="marquee-dot"></span></span>
+        </div>
+    </div>
+
+    <section class="clients reveal">
+        <div class="clients-container">
+            <div class="clients-header">
+                <h2 class="syne">Trusted By</h2>
+                <div class="clients-count">40+ 브랜드와 협업</div>
+            </div>
+            <div class="clients-grid">
+                <div class="client-cell">Samsung</div>
+                <div class="client-cell">Naver</div>
+                <div class="client-cell">Kakao</div>
+                <div class="client-cell">LG</div>
+                <div class="client-cell">Hyundai</div>
+                <div class="client-cell">CJ ENM</div>
+                <div class="client-cell">Amore Pacific</div>
+                <div class="client-cell">SK</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="reviews reveal">
+        <div class="reviews-header">
+            <div class="label">Kind Words</div>
+            <h2 class="syne">클라이언트 후기</h2>
+        </div>
+        <div class="review-stack">
+            <div class="review-card">
+                <p class="review-text syne">"RAWKID는 우리 브랜드를 완전히 다시 태어나게 했습니다. 대담하면서도 정교한 작업이 인상적이었고, 론칭 후 SNS 반응이 폭발적이었습니다."</p>
+                <div class="review-author-row">
+                    <div>
+                        <div class="review-author">이수진</div>
+                        <div class="review-role">MOODA Beauty CMO</div>
+                    </div>
+                    <div class="review-project">Brand Identity</div>
+                </div>
+            </div>
+            <div class="review-card">
+                <p class="review-text syne">"앱 리뉴얼 프로젝트에서 보여준 UX 리서치 깊이와 비주얼 퀄리티가 놀라웠습니다. 유저 리텐션이 40% 이상 개선되었습니다."</p>
+                <div class="review-author-row">
+                    <div>
+                        <div class="review-author">박정우</div>
+                        <div class="review-role">FitLoop CEO</div>
+                    </div>
+                    <div class="review-project">Digital Product</div>
+                </div>
+            </div>
+            <div class="review-card">
+                <p class="review-text syne">"캠페인 영상 하나로 브랜드 인지도가 완전히 바뀌었습니다. RAWKID 팀의 스토리텔링 능력은 차원이 다릅니다."</p>
+                <div class="review-author-row">
+                    <div>
+                        <div class="review-author">김하늘</div>
+                        <div class="review-role">Green Wave 마케팅 디렉터</div>
+                    </div>
+                    <div class="review-project">Motion & Campaign</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta reveal" id="contact">
+        <div class="cta-label">Next Project</div>
+        <h2 class="syne">
+            함께 <span class="outline">대담한</span><br>
+            것을 만들어요
+        </h2>
+        <a href="mailto:hello@rawkid.kr" class="cta-btn">
+            프로젝트 문의하기 <span class="arrow">&rarr;</span>
+        </a>
+        <p class="cta-sub">hello@rawkid.kr &middot; 보통 24시간 내 회신드립니다</p>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="logo syne">RAW<span>KID</span></div>
+                    <p>과감하고 정교하게.<br>크리에이티브 스튜디오, 서울.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Navigate</h4>
+                    <a href="#">Work</a>
+                    <a href="#">About</a>
+                    <a href="#">Services</a>
+                    <a href="#">Contact</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Connect</h4>
+                    <a href="#">Instagram</a>
+                    <a href="#">Behance</a>
+                    <a href="#">Dribbble</a>
+                    <a href="#">LinkedIn</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Info</h4>
+                    <a href="#">Careers</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span class="footer-copy">&copy; 2026 RAWKID Studio. All rights reserved.</span>
+                <div class="footer-social">
+                    <a href="#">IG</a>
+                    <a href="#">BE</a>
+                    <a href="#">DR</a>
+                    <a href="#">LI</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Cursor blob follow
+        document.addEventListener('mousemove', e => {
+            const blob = document.getElementById('cursorBlob');
+            blob.style.left = e.clientX + 'px';
+            blob.style.top = e.clientY + 'px';
+        });
+
+        // Scroll reveal
+        window.addEventListener('scroll', () => {
+            document.querySelectorAll('.reveal, .reveal-left').forEach(el => {
+                if (el.getBoundingClientRect().top < window.innerHeight * 0.85) {
+                    el.classList.add('visible');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

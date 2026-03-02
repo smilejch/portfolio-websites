@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Web Design Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0A0A0A; color: #F2F2F0; min-height: 100vh; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 80px 32px; }
+        header { text-align: center; margin-bottom: 80px; }
+        header h1 { font-size: 48px; font-weight: 900; letter-spacing: -2px; margin-bottom: 12px; }
+        header h1 span { background: linear-gradient(135deg, #CDFF50, #4ECDC4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        header p { font-size: 16px; color: #666; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .card {
+            border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; overflow: hidden;
+            transition: all 0.4s ease; cursor: pointer; text-decoration: none; color: inherit;
+            display: block; background: rgba(255,255,255,0.02);
+        }
+        .card:hover { transform: translateY(-6px); border-color: rgba(205,255,80,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .card-preview {
+            height: 220px; display: flex; align-items: center; justify-content: center;
+            font-size: 56px; position: relative;
+        }
+        .card-preview .overlay {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s;
+            font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #CDFF50;
+        }
+        .card:hover .card-preview .overlay { opacity: 1; }
+        .p1 { background: linear-gradient(145deg, #1a1040, #0c1b33); }
+        .p2 { background: linear-gradient(145deg, #d4c5a8, #bfb09a); }
+        .p3 { background: linear-gradient(145deg, #0c1b33, #162d50); }
+        .p4 { background: linear-gradient(145deg, #f0f0f0, #e0e0e0); }
+        .p5 { background: linear-gradient(145deg, #2c2c2c, #1c1c1c); }
+        .p6 { background: linear-gradient(145deg, #0d0d0d, #1a1a1a); border-top: 2px solid #CDFF50; }
+        .card-body { padding: 24px; }
+        .card-num { font-size: 11px; color: #555; font-weight: 700; letter-spacing: 2px; margin-bottom: 8px; }
+        .card-title { font-size: 20px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .card-desc { font-size: 13px; color: #777; line-height: 1.6; }
+        .card-tags { display: flex; gap: 6px; margin-top: 16px; flex-wrap: wrap; }
+        .tag {
+            padding: 4px 12px; border-radius: 50px; font-size: 10px; font-weight: 600;
+            letter-spacing: 0.5px; border: 1px solid rgba(255,255,255,0.1); color: #999;
+        }
+        footer { text-align: center; margin-top: 80px; font-size: 13px; color: #444; }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            header h1 { font-size: 32px; }
+            .container { padding: 48px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Web Design <span>Portfolio</span></h1>
+            <p>6 High-Quality Website Designs</p>
+        </header>
+        <div class="grid">
+            <a class="card" href="01-tech-startup.html">
+                <div class="card-preview p1">⚡<div class="overlay">View Site &rarr;</div></div>
+                <div class="card-body">
+                    <div class="card-num">PROJECT 01</div>
+                    <div class="card-title">NexaFlow</div>
+                    <div class="card-desc">AI 기반 업무 자동화 SaaS 플랫폼. 다크 테마 + 퍼플/시안 그라데이션.</div>
+                    <div class="card-tags"><span class="tag">SaaS</span><span class="tag">Dark Theme</span><span class="tag">Dashboard</span></div>
+                </div>
+            </a>
+            <a class="card" href="02-product-landing.html">
+                <div class="card-preview p2">🎧<div class="overlay">View Site &rarr;</div></div>
+                <div class="card-body">
+                    <div class="card-num">PROJECT 02</div>
+                    <div class="card-title">AuraSound</div>
+                    <div class="card-desc">프리미엄 무선 이어폰 랜딩 페이지. 웜 크림 톤 + 제품 중심 레이아웃.</div>
+                    <div class="card-tags"><span class="tag">Product</span><span class="tag">E-Commerce</span><span class="tag">Warm Tone</span></div>
+                </div>
+            </a>
+            <a class="card" href="03-law-firm.html">
+                <div class="card-preview p3">⚖️<div class="overlay">View Site &rarr;</div></div>
+                <div class="card-body">
+                    <div class="card-num">PROJECT 03</div>
+                    <div class="card-title">한율 법무법인</div>
+                    <div class="card-desc">법무법인 홈페이지. 네이비/골드 톤 + 세리프 타이포그래피.</div>
+                    <div class="card-tags"><span class="tag">Law Firm</span><span class="tag">Corporate</span><span class="tag">Serif</span></div>
+                </div>
+            </a>
+            <a class="card" href="04-investment.html">
+                <div class="card-preview p4">📈<div class="overlay">View Site &rarr;</div></div>
+                <div class="card-body">
+                    <div class="card-num">PROJECT 04</div>
+                    <div class="card-title">Vertex Capital</div>
+                    <div class="card-desc">투자회사 홈페이지. 클린 화이트/그린 + 마켓 데이터 시각화.</div>
+                    <div class="card-tags"><span class="tag">Finance</span><span class="tag">Clean</span><span class="tag">Charts</span></div>
+                </div>
+            </a>
+            <a class="card" href="05-real-estate.html">
+                <div class="card-preview p5">🏗️<div class="overlay">View Site &rarr;</div></div>
+                <div class="card-body">
+                    <div class="card-num">PROJECT 05</div>
+                    <div class="card-title">LUMOS Architecture</div>
+                    <div class="card-desc">건축 스튜디오 홈페이지. 미니멀 럭셔리 + 프로젝트 갤러리.</div>
+                    <div class="card-tags"><span class="tag">Architecture</span><span class="tag">Minimal</span><span class="tag">Luxury</span></div>
+                </div>
+            </a>
+            <a class="card" href="06-creative-agency.html">
+                <div class="card-preview p6">🎨<div class="overlay">View Site &rarr;</div></div>
+                <div class="card-body">
+                    <div class="card-num">PROJECT 06</div>
+                    <div class="card-title">RAWKID Studio</div>
+                    <div class="card-desc">크리에이티브 에이전시. 네온 그린 + 그레인 텍스처 + 아방가르드.</div>
+                    <div class="card-tags"><span class="tag">Agency</span><span class="tag">Avant-Garde</span><span class="tag">Neon</span></div>
+                </div>
+            </a>
+        </div>
+        <footer>&copy; 2026 Portfolio Collection. All rights reserved.</footer>
+    </div>
+</body>
+</html>
